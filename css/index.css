@@ -1,0 +1,30 @@
+body {
+  padding-top: 50px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+h4 {
+  margin-top: 25px;
+}
+
+/* Reset the container */
+.container {
+  width: 970px;
+  max-width: none !important;
+}
+
+.imagegrid {
+	padding-left: 0px;
+	padding-right: 0px;
+	width: 40px;
+	position: relative;
+  	min-height: 1px;
+}
+
+.stone {
+	position:absolute;
+	top: 0px;
+	z-index:100;
+}
