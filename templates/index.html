@@ -17,7 +17,7 @@
     <script src="js/controllers.js"></script>
   </head>
 
-  <body ng-controller="GoGoBanCtrl">
+  <body ng-controller="GoGoBanLobbyCtrl">
 
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
@@ -39,33 +39,54 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
-
-    <div class="container">
-
-      <div class="page-header">
-        <div class="row" ng-repeat="row in board track by $index">
-          <div class="col-md-1 imagegrid" ng-repeat="item in row track by $index" ng-click="print($parent.$index,$index)">
-
-              <div ng-if="$parent.$middle">
-                <img style="transform:rotate(-90deg)"src="/img/inte.jpg" height="40px" width="40px" ng-if="$first"/>
-                <img style="transform:rotate(90deg)"src="/img/inte.jpg" height="40px" width="40px" ng-if="$last "/>
-                <img src="/img/int.jpg" height="40px" width="40px" ng-if="$middle"/>
-              </div>
-              <div ng-if="$parent.$first">
-                <img style="transform:rotate(0deg)"src="/img/intc.jpg" height="40px" width="40px" ng-if="$first"/>
-                <img style="transform:rotate(90deg)"src="/img/intc.jpg" height="40px" width="40px" ng-if="$last "/>
-                <img src="/img/inte.jpg" height="40px" width="40px" ng-if="$middle"/>
-              </div>
-               <div ng-if="$parent.$last">
-                <img style="transform:rotate(-90deg)" src="/img/intc.jpg" height="40px" width="40px" ng-if="$first"/>
-                <img style="transform:rotate(180deg)" src="/img/intc.jpg" height="40px" width="40px" ng-if="$last "/>
-                <img style="transform:rotate(180deg)" src="/img/inte.jpg" height="40px" width="40px" ng-if="$middle"/>
-              </div>
-              <!-- <img class="stone" src="/img/Realistic_Go_Stone.svg" height="40px" width="40px" /> -->
-          </div>
+    <div ng-if="name==''" class="container jumbotron">
+      <form role="form">
+        <div class="form-group">
+          <label for="nameinput" >Name</label>
+          <input class="form-control input-large" id="nameinput" placeholder="Enter name" ng-model="name">
         </div>
-      </div>
-    </div><!-- /.container -->
+        <button class="btn btn-large" type="submit" name="submit" ng-click="sendName(name)" value="Submit" >Submit </button>
+      </form>
+      
+    </div>
+    <div class="container">
+      <table class="table table-hover table-striped">
+        <th>Name</th>
+        <tr ng-repeat="player in players" ng-click="request(player)"><td>{{player}}</td></tr>
+      </table>
+    </div>
+
+    <div id="modal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">A challenger has appeared</h4>
+          </div>
+          <div class="modal-body">
+            <p>Would you like to play a game with {{opponent}}?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Accept</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Decline</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div id="request" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">You are challenging</h4>
+          </div>
+          <div class="modal-body">
+            <p>Requesting a game with {{opponent}} ...</p>
+          </div>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 
     <!-- Bootstrap core JavaScript
