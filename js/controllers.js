@@ -27,17 +27,19 @@ GoGoBan.controller('GoGoBanCtrl', function ($scope) {
   }
 });
 
-GoGoBan.controller('GoGoBanLobbyCtrl', function ($scope) {
+GoGoBan.controller('GoGoBanLobbyCtrl', function ($scope,$window) {
+
   $scope.players = []
   $scope.name = ''
   $scope.opponent = ''
   var connection = new WebSocket('ws://'+window.location.host+'/ws/lobby', []);
   connection.onmessage = function(e){
   	obj = JSON.parse(e.data)
-  	if(obj.Source != undefined){
+  	if(obj.Status == "request"){
   		$scope.opponent = obj.Source
   		$('#modal').modal({})
-
+	}else if(obj.Status == "accept"){
+		$window.location.href = $window.location.host +'/board'
   	}else{
 	  	$scope.players = obj
   	}
@@ -50,8 +52,17 @@ GoGoBan.controller('GoGoBanLobbyCtrl', function ($scope) {
   }
   $scope.request = function(name){
 	$scope.opponent = name
-	$scope.$apply()
 	$('#request').modal({})
-  	connection.send(JSON.stringify({"Target":name,"Source":$scope.name}))
+  	connection.send(JSON.stringify({"Status":"request","Target":name,"Source":$scope.name}))
+  }
+
+  $scope.acceptRequest = function(){
+  	connection.send(JSON.stringify({"Status":"accept","Target":$scope.opponent,"Source":$scope.name}))
+  }
+  $scope.declineRequest = function(){
+  	connection.send(JSON.stringify({"Accept":false}))
+  }
+  $scope.cancelRequest = function(){
+  	connection.send(JSON.stringify({"Cancel":true}))
   }
 });

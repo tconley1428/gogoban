@@ -33,10 +33,19 @@ type Move struct {
 	Y      int
 	Player Player
 }
+type Status string
+
+const (
+	Request Status = "request"
+	Accept  Status = "accept"
+	Cancel  Status = "cancel"
+	Decline Status = "decline"
+)
 
 type GameLink struct {
 	Source string
 	Target string
+	Status Status
 }
 
 type Server struct {
@@ -44,8 +53,7 @@ type Server struct {
 	Exeunt    chan User
 	Players   []User
 	Broadcast chan bool
-	Request   chan GameLink
-	Accept    chan GameLink
+	GameLinks chan GameLink
 }
 
 type Player string
@@ -108,31 +116,39 @@ func (s *Server) Lobby() {
 		select {
 		case u = <-s.Entrants:
 			glog.V(1).Infoln("New player")
-			s.Players = append(s.Players, u)
-			broadcast(s.Players)
+			s.Enter(u)
 		case u = <-s.Exeunt:
 			glog.V(1).Infoln("Player left")
 			s.Exit(u)
-		case gl = <-s.Request:
-			glog.V(1).Infoln("Requesting game:", gl)
+		case gl = <-s.GameLinks:
 			target, err := findUser(s.Players, gl.Target)
-			if err != nil {
-				glog.Errorln(err)
-				continue
+			source, err := findUser(s.Players, gl.Source)
+
+			switch gl.Status {
+			case Request:
+				glog.V(1).Infoln("Requesting game:", gl)
+				if err != nil {
+					glog.Errorln(err)
+					continue
+				}
+				target.Connection.WriteJSON(gl)
+			case Accept:
+				glog.V(1).Infoln("Accepting game:", gl)
+				if err != nil {
+					continue
+				}
+				src, err := findUser(s.Players, gl.Source)
+				if err != nil {
+					continue
+				}
+				s.Exit(target)
+				s.Exit(src)
+				source.Connection.WriteJSON(gl)
+			case Cancel:
+				target.Connection.WriteJSON(gl)
+			case Decline:
+				source.Connection.WriteJSON(gl)
 			}
-			target.Connection.WriteJSON(gl)
-		case gl = <-s.Accept:
-			glog.V(1).Infoln("Accepting game:", gl)
-			target, err := findUser(s.Players, gl.Target)
-			if err != nil {
-				continue
-			}
-			src, err := findUser(s.Players, gl.Source)
-			if err != nil {
-				continue
-			}
-			s.Exit(target)
-			s.Exit(src)
 		}
 	}
 }
@@ -144,6 +160,10 @@ func (s *Server) Exit(u User) {
 		s.Players[i], s.Players = s.Players[len(s.Players)-1], s.Players[:len(s.Players)-1]
 		broadcast(s.Players)
 	}
+}
+func (s *Server) Enter(u User) {
+	s.Players = append(s.Players, u)
+	broadcast(s.Players)
 }
 
 func findUser(slice []User, name string) (User, error) {
@@ -182,6 +202,7 @@ func (s *Server) lobbyhandler(rw http.ResponseWriter, req *http.Request) {
 		glog.Errorln(err)
 		return
 	}
+
 	_, message, _ := conn.ReadMessage()
 	glog.Infoln("Player entered lobby:", string(message))
 	s.Entrants <- User{Connection: conn, Name: string(message)}
@@ -195,7 +216,7 @@ func (s *Server) lobbyhandler(rw http.ResponseWriter, req *http.Request) {
 			s.Exeunt <- User{Connection: conn, Name: string(message)}
 			return
 		}
-		s.Request <- gamelink
+		s.GameLinks <- gamelink
 	}
 }
 
@@ -223,11 +244,10 @@ func main() {
 	glog.V(2).Infoln(img)
 
 	server := Server{
-		Players:  []User{},
-		Exeunt:   make(chan User),
-		Entrants: make(chan User),
-		Request:  make(chan GameLink),
-		Accept:   make(chan GameLink),
+		Players:   []User{},
+		Exeunt:    make(chan User),
+		Entrants:  make(chan User),
+		GameLinks: make(chan GameLink),
 	}
 
 	http.Handle("/js/", http.StripPrefix("/js", http.FileServer(http.Dir(js))))
