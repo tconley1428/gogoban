@@ -1,0 +1,52 @@
+<div>
+  <div ng-if="name==''" class="container jumbotron">
+    <form role="form">
+      <div class="form-group">
+        <label for="nameinput" >Name</label>
+        <input class="form-control input-large" id="nameinput" placeholder="Enter name" ng-model="name">
+      </div>
+      <button class="btn btn-large" type="submit" name="submit" ng-click="sendName(name)" value="Submit" >Submit </button>
+    </form>
+    
+  </div>
+  <div class="container">
+    <table class="table table-hover table-striped">
+      <th>Name</th>
+      <tr ng-repeat="player in players" ng-click="request(player)"><td>{{player}}</td></tr>
+    </table>
+  </div>
+
+  <div id="challenge" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">A challenger has appeared</h4>
+        </div>
+        <div class="modal-body">
+          <p>Would you like to play a game with {{opponent}}?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="acceptRequest()">Accept</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="declineRequest()">Decline</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <div id="request" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">You are challenging</h4>
+        </div>
+        <div class="modal-body">
+          <p>Requesting a game with {{opponent}} ...</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelRequest()">Cancel</button>
+          </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</div>

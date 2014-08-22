@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="page-header">
+    <div class="row" ng-repeat="row in board track by $index">
+      <div class="col-md-1 imagegrid" ng-repeat="item in row track by $index" ng-click="click($parent.$index,$index)">
+          <div ng-if="$parent.$middle">
+            <img style="transform:rotate(-90deg)"src="/www/img/inte.jpg" height="40px" width="40px" ng-if="$first"/>
+            <img style="transform:rotate(90deg)"src="/www/img/inte.jpg" height="40px" width="40px" ng-if="$last "/>
+            <img src="/www/img/int.jpg" height="40px" width="40px" ng-if="$middle"/>
+          </div>
+          <div ng-if="$parent.$first">
+            <img style="transform:rotate(0deg)"src="/www/img/intc.jpg" height="40px" width="40px" ng-if="$first"/>
+            <img style="transform:rotate(90deg)"src="/www/img/intc.jpg" height="40px" width="40px" ng-if="$last "/>
+            <img src="/www/img/inte.jpg" height="40px" width="40px" ng-if="$middle"/>
+          </div>
+          <div ng-if="$parent.$last">
+            <img style="transform:rotate(-90deg)" src="/www/img/intc.jpg" height="40px" width="40px" ng-if="$first"/>
+            <img style="transform:rotate(180deg)" src="/www/img/intc.jpg" height="40px" width="40px" ng-if="$last "/>
+            <img style="transform:rotate(180deg)" src="/www/img/inte.jpg" height="40px" width="40px" ng-if="$middle"/>
+          </div>
+          <img ng-if="item.Player==='black'" class="stone" src="/www/img/black.svg" height="40px" width="40px" /> 
+          <img ng-if="item.Player==='white'" class="stone" src="/www/img/white.svg" height="40px" width="40px" /> 
+      </div>
+    </div>
+  </div>
+</div><!-- /.container -->
