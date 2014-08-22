@@ -1,8 +1,36 @@
-<h1>Login</h1>
-<form method="post" action="/login">
-    <label for="name">User name</label>
-    <input type="text" id="name" name="name">
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password">
-    <button type="submit">Login</button>
-</form>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-10 col-md-offset-4">
+            <h1 class="text-center login-title">Sign in to continue to GoGoBan</h1>
+        	<div class="alert alert-error alert-danger" ng-if="failed">Could not log in, wrong username or password</div>
+            <div class="account-wall">
+                <img class="profile-img" src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120"
+                    alt="">
+                <form class="form-signin" method="post" action="/login">
+                <input type="text" class="form-control" placeholder="Email" required autofocus id="name" name="name" value="{{email}}"> 
+                <input type="password" class="form-control" placeholder="Password" required id="password" name="password">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">
+                    Sign in</button>
+                </form>
+            </div>
+            <a href="" ng-click="register()" class="text-center new-account">Create an account </a>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="register">
+	<div class="modal-dialog">
+        <div class="modal-content">
+	        <div class="modal-header">
+	    		<h3 class="modal-title">Please sign up for GoGoBan</h3>
+			</div>
+			<div class="modal-body">
+				<form role="form" method="post" action="/register">
+					<input type="email" name="email" id="email" class="form-control input-lg" placeholder="Email Address">
+					<input type="password" name="password" id="password" class="form-control input-lg" placeholder="Password">
+					<input type="password" name="password_confirmation" id="password_confirmation" class="form-control input-lg" placeholder="Confirm Password"> 
+	    			<input type="submit" value="Register" class="btn btn-lg btn-primary btn-block">
+	    		</form>
+    		</div>
+		</div>
+	</div>
+</div>

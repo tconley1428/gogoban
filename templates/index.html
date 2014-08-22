@@ -7,19 +7,22 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>GoGoBan</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/www/css/bootstrap.min.css" rel="stylesheet">
 
-    <link href="/css/index.css" rel="stylesheet">
-    <script src="js/angular.js"></script>
-    <script src="js/controllers.js"></script>
+    <link href="/www/css/index.css" rel="stylesheet">
+    <script src="/www/js/angular.js"></script>
+    <script src="/www/js/angular-route.js"></script>
+    <script src="/www/js/controllers.js"></script>
+    <script src="/www/js/app.js"> </script>
+
   </head>
 
-  <body ng-controller="GoGoBanLobbyCtrl">
+  <body >
 
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div ng-controller="MenuCtrl" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -28,7 +31,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="#">GoGoBan</a>
+          <a class="navbar-brand" href="#" id="username">{{username}}</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -37,62 +41,17 @@
             <li><a href="#contact">Contact</a></li>
           </ul>
         </div><!--/.nav-collapse -->
+         
       </div>
     </div>
-    <div ng-if="name==''" class="container jumbotron">
-      <form role="form">
-        <div class="form-group">
-          <label for="nameinput" >Name</label>
-          <input class="form-control input-large" id="nameinput" placeholder="Enter name" ng-model="name">
-        </div>
-        <button class="btn btn-large" type="submit" name="submit" ng-click="sendName(name)" value="Submit" >Submit </button>
-      </form>
-      
-    </div>
-    <div class="container">
-      <table class="table table-hover table-striped">
-        <th>Name</th>
-        <tr ng-repeat="player in players" ng-click="request(player)"><td>{{player}}</td></tr>
-      </table>
-    </div>
+    <div ng-view>
 
-    <div id="modal" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title">A challenger has appeared</h4>
-          </div>
-          <div class="modal-body">
-            <p>Would you like to play a game with {{opponent}}?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="acceptRequest()">Accept</button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="declineRequest()">Decline</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-    <div id="request" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title">You are challenging</h4>
-          </div>
-          <div class="modal-body">
-            <p>Requesting a game with {{opponent}} ...</p>
-          </div>
-            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelRequest()">Cancel</button>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
+    </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/jquery-2.1.1.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="/www/js/jquery-2.1.1.js"></script>
+    <script src="/www/js/bootstrap.min.js"></script>
   </body>
 </html>

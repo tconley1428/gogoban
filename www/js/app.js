@@ -12,6 +12,10 @@ GoGoBan.
         templateUrl: '/www/partials/login.html',
         controller: 'LoginCtrl'
       })
+      // .when('/login/:error', {
+      //   templateUrl: '/www/partials/login.html',
+      //   controller: 'LoginCtrl'
+      // })
       .when('/lobby', {
         templateUrl: '/www/partials/lobby.html',
         controller: 'LobbyCtrl'

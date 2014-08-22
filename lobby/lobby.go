@@ -166,6 +166,12 @@ func (s *Lobby) GameHandler(rw http.ResponseWriter, req *http.Request) {
 	username := userCookie.Value
 	if err != nil {
 		glog.Errorln("Player not logged in")
+		http.Redirect(rw, req, "/#/", 302)
+		return
+	}
+	if !users.Exists(username) {
+		http.Redirect(rw, req, "/#/", 302)
+		glog.Errorln("Non existent Player")
 		return
 	}
 	session := mux.Vars(req)["session"]

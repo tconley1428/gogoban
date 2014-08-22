@@ -13,6 +13,20 @@ function getCookie(cname) {
     return "";
 }
 
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+
+    var params = {}, tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}
+
 GoGoBanControllers.controller('BoardCtrl', function ($scope) {
   $scope.room = window.location.hash.substring(window.location.hash.lastIndexOf('/')+1)
   $scope.IsTurn = false
@@ -45,13 +59,15 @@ GoGoBanControllers.controller('BoardCtrl', function ($scope) {
   }
 });
 
-GoGoBanControllers.controller('LoginCtrl', function ($scope) {
-
+GoGoBanControllers.controller('LoginCtrl', function ($scope,$routeParams) {
+  $scope.failed = $routeParams["failed"]!=undefined
+  $scope.email = $routeParams["failed"]
+  $scope.register = function(){
+    $("#register").modal({})
+  }
 })
 
 GoGoBanControllers.controller('MenuCtrl', function ($scope) {
-
-
   $scope.username = getCookie("username")
 })
 
