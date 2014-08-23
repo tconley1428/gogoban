@@ -67,11 +67,15 @@ func (s *Lobby) Run() {
 			glog.V(1).Infoln("Player left")
 			s.Exit(u)
 		case gl = <-s.GameLinks:
+			glog.V(1).Infoln(gl.Target)
 			target, err := findusers(s.Players, gl.Target)
 			if err != nil {
 				glog.Errorln(err)
 				continue
 			}
+			glog.V(1).Infoln(s.Players)
+			glog.V(1).Infoln(gl.Source)
+
 			source, err := findusers(s.Players, gl.Source)
 			if err != nil {
 				glog.Errorln(err)
@@ -116,11 +120,6 @@ func (s *Lobby) Exit(u users.User) {
 	}
 }
 func (s *Lobby) Enter(u users.User) error {
-	for _, v := range s.Players {
-		if v.Name == u.Name {
-			return fmt.Errorf("Player already in lobby")
-		}
-	}
 	s.Players = append(s.Players, u)
 	broadcast(s.Players)
 	return nil
@@ -151,6 +150,7 @@ func broadcast(players []users.User) {
 	for _, p := range players {
 		names = append(names, p.Name)
 	}
+	glog.V(1).Infoln(names)
 	for _, p := range players {
 		go func(p users.User) { p.Connection.WriteJSON(names) }(p)
 	}
@@ -162,15 +162,14 @@ func (s *Lobby) GameHandler(rw http.ResponseWriter, req *http.Request) {
 		glog.Errorln(err)
 		return
 	}
-	userCookie, err := req.Cookie("username")
-	username := userCookie.Value
+	username, err := users.GetName(req)
 	if err != nil {
 		glog.Errorln("Player not logged in")
-		http.Redirect(rw, req, "/#/", 302)
+		conn.Close()
 		return
 	}
 	if !users.Exists(username) {
-		http.Redirect(rw, req, "/#/", 302)
+		conn.Close()
 		glog.Errorln("Non existent Player")
 		return
 	}
@@ -179,7 +178,6 @@ func (s *Lobby) GameHandler(rw http.ResponseWriter, req *http.Request) {
 	glog.V(2).Infoln(s.Games)
 	glog.V(2).Infoln("Player ", username, " entered game:", session)
 	game, exists := s.Games[session]
-	glog.V(1).Infoln(game, " ", exists)
 	if !exists {
 		glog.Errorf("Game does not exist: %v in %v", session, s.Games)
 		return
@@ -205,20 +203,25 @@ func (s *Lobby) Handler(rw http.ResponseWriter, req *http.Request) {
 		glog.Errorln(err)
 		return
 	}
+	username, err := users.GetName(req)
+	if err != nil {
+		glog.Errorln(err)
+		conn.WriteMessage(websocket.TextMessage, []byte("InvalidLogin"))
+		conn.Close()
+		return
+	}
+	glog.V(2).Infoln("Player entered lobby:", username)
 
-	_, message, _ := conn.ReadMessage()
-	glog.V(2).Infoln("Player entered lobby:", string(message))
-	s.Entrants <- users.User{Connection: conn, Name: string(message)}
+	s.Entrants <- users.User{Connection: conn, Name: username}
 	for {
 		glog.V(1).Infoln("Awaiting request")
-		gamelink := GameLink{}
+		gamelink := GameLink{Source: username}
 		err = conn.ReadJSON(&gamelink)
-		glog.V(1).Infoln("Request received:", gamelink)
 		if err != nil {
 			glog.Errorln(err)
-			s.Exeunt <- users.User{Connection: conn, Name: string(message)}
 			return
 		}
+		glog.V(1).Infoln("Request received:", gamelink)
 		s.GameLinks <- gamelink
 	}
 }

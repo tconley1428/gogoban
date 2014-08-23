@@ -8,7 +8,6 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/securecookie"
 
 	"github.com/golang/glog"
 )
@@ -29,6 +28,12 @@ func board(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		glog.Errorln(err)
 	}
+}
+
+func expiredHandler(response http.ResponseWriter, request *http.Request) {
+	glog.V(1).Infoln("Clearing expired cookie")
+	clearSession(response)
+	http.Redirect(response, request, "/#/login", 302)
 }
 
 func loginHandler(response http.ResponseWriter, request *http.Request) {
@@ -64,7 +69,7 @@ func setSession(userName string, response http.ResponseWriter) {
 	value := map[string]string{
 		"name": userName,
 	}
-	if encoded, err := cookieHandler.Encode("session", value); err == nil {
+	if encoded, err := users.CookieHandler.Encode("session", value); err == nil {
 		http.SetCookie(response, &http.Cookie{
 			Name:  "session",
 			Value: encoded,
@@ -88,9 +93,6 @@ func clearSession(response http.ResponseWriter) {
 	http.SetCookie(response, cookie)
 }
 
-var cookieHandler = securecookie.New(
-	securecookie.GenerateRandomKey(64),
-	securecookie.GenerateRandomKey(32))
 var router = mux.NewRouter()
 
 func Start(dir string) {
@@ -106,6 +108,7 @@ func Start(dir string) {
 	lob := lobby.CreateLobby()
 	go lob.Run()
 
+	router.HandleFunc("/expired", expiredHandler)
 	router.HandleFunc("/register", registerHandler).Methods("POST")
 	router.HandleFunc("/login", loginHandler).Methods("POST")
 	router.HandleFunc("/logout", logoutHandler).Methods("POST")
